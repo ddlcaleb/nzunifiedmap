@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NZ Road Closures Map</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Leaflet CSS -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
+
+  <!-- Your custom CSS -->
+  <link rel="stylesheet" href="style.css" />
+</head>
+<div id="legend">
+  <h4>RAMM Legend</h4>
+  <div><span style="background:red;"></span> Closed</div>
+  <div><span style="background:orange;"></span> Restricted</div>
+  
+  <div><span style="background:gray;"></span> Other</div>
+</div>
+
+<div id="updates">
+  <div><strong>NZTA Last Updated:</strong> <span id="nzta-updated">Loading...</span></div>
+  <div><strong>RAMM Last Updated:</strong> <span id="ramm-updated">Loading...</span></div>
+</div>
+
+
+
+
+<body>
+  <div id="map"></div>
+
+<!-- Leaflet JS -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<!-- Custom Icons -->
+<script src="nztaIcons.js"></script>
+
+<!-- Map Logic -->
+<script src="script.js"></script>
+
+</body>
+</html>
