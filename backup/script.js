@@ -1,99 +1,43 @@
-// Configuration
-const REFRESH_INTERVAL = 2 * 60 * 1000; // 5 minutes
-let nztaDataTimestamp = 0;
-let councilDataTimestamp = 0;
 
-// 1. Setup map and layers
+
+// 1. Setup map
 const map = L.map('map').setView([-41.2706, 173.2840], 7);
 const nztaLayer = L.layerGroup().addTo(map);
 const councilLayer = L.layerGroup().addTo(map);
 
-// 2. Add tile layer
+// 2. Add tile layer (OpenStreetMap)
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap contributors'
 }).addTo(map);
 
-// 3. Automatic refresh system
-function initAutoRefresh() {
-  // Initial data load
-  fetchNZTAData();
-  fetchCouncilData();
-  
-  // Set up periodic refresh
-  setInterval(() => {
-    fetchNZTAData();
-    fetchCouncilData();
-  }, REFRESH_INTERVAL);
-  
-  // Add manual refresh button
-  const refreshBtn = L.easyButton('fa-refresh', () => {
-    fetchNZTAData();
-    fetchCouncilData();
-  }).addTo(map);
-  refreshBtn.setPosition('topright');
+function formatDateTime(timestamp) {
+  const date = new Date(timestamp);
+  return date.toLocaleString("en-NZ", {
+    dateStyle: "medium",
+    timeStyle: "short",
+    hour12: false,
+    timeZone: "Pacific/Auckland"
+  });
 }
 
-// 4. Data fetching functions
-async function fetchNZTAData() {
-  try {
-    const response = await fetch(`https://corsproxy.io/?https://www.journeys.nzta.govt.nz/assets/map-data-cache/delays.json?t=${Date.now()}`);
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    
-    const data = await response.json();
-    if (data.lastUpdated <= nztaDataTimestamp) return; // Skip if no updates
-    
-    nztaDataTimestamp = data.lastUpdated;
-    document.getElementById("nzta-updated").textContent = formatDateTime(nztaDataTimestamp * 1000);
-    processNZTAData(data);
-  } catch (error) {
-    console.error("Failed to load NZTA data:", error);
-    showDataError("nzta");
-  }
-}
+// =========================================================
+//  Fetch real NZTA data                                  ||
+// =========================================================
+fetch('https://corsproxy.io/?https://www.journeys.nzta.govt.nz/assets/map-data-cache/delays.json')
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log("NZTA data loaded:", data);
+    const nztaTimestamp = new Date(data.lastUpdated * 1000);
+    document.getElementById("nzta-updated").textContent = formatDateTime(nztaTimestamp);
 
-async function fetchCouncilData() {
-  try {
-    const response = await fetch(
-      `https://corsproxy.io/?https://apps.ramm.com/GIS/?key=cc6661bdb9e5&SERVICE=WFS&VERSION=1.0.0&REQUEST=GetFeature&TYPENAME=cc6661bdb9e5:wfs_road_closures_combined_nztm&SRSNAME=EPSG:4326&outputFormat=json&t=${Date.now()}`
-    );
-    
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    
-    const data = await response.json();
-   
-const councilServerTime = new Date(data.timeStamp);
-if (councilServerTime <= councilDataTimestamp) return;
-councilDataTimestamp = councilServerTime;
-
-
-const rammUpdatedEl = document.getElementById("ramm-updated");
-if (data.timeStamp && rammUpdatedEl) {
-  const councilServerTime = new Date(data.timeStamp);
-  rammUpdatedEl.textContent = formatDateTime(councilServerTime);
-  councilDataTimestamp = councilServerTime;
-} else {
-  rammUpdatedEl.textContent = "⚠️ No timestamp in data";
-}
-
-    
-    // document.getElementById("council-updated").textContent = formatDateTime(Date.now());
-    processCouncilData(data);
-  } catch (error) {
-    console.error("Failed to load Council data:", error);
-    showDataError("council");
-  }
-}
-
-// 5. Data processing functions
-function processNZTAData(data) {
-  // Clear previous data
-  nztaLayer.clearLayers();
-  
-  const features = data.features || data;
-  features.forEach(item => {
-    // ... (your existing NZTA processing logic) ...
-    // Add processed markers to nztaLayer
-    const props = item.properties || item;
+    const features = data.features || data;
+    features.forEach(item => {
+      const props = item.properties || item;
 
       // 🔽 Determine the icon type
       const rawType = props.EventType?.toLowerCase() || "default";
@@ -159,18 +103,31 @@ function processNZTAData(data) {
       } else {
         console.warn("❌ Skipped NZTA feature: invalid or missing coordinates", props.Name || props.LocationArea);
       }
-
+    });
+  })
+  .catch(error => {
+    console.error("Failed to load NZTA data:", error);
   });
-}
 
-function processCouncilData(data) {
-  // Clear previous data
-  councilLayer.clearLayers();
-  
-  data.features.forEach(feature => {
-    // ... (your existing Council processing logic) ...
-    // Add processed markers to councilLayer
-    const props = feature.properties;
+  // =========================================================
+  //  FETCH RAMM COUNCIL DATA                               ||
+  // =========================================================
+
+
+fetch('https://corsproxy.io/?https://apps.ramm.com/GIS/?key=cc6661bdb9e5&SERVICE=WFS&VERSION=1.0.0&REQUEST=GetFeature&TYPENAME=cc6661bdb9e5:wfs_road_closures_combined_nztm&SRSNAME=EPSG:4326&outputFormat=json')
+  .then(response => {
+    document.getElementById("ramm-updated").textContent = formatDateTime(Date.now());
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log("RAMM data loaded:", data);
+
+    data.features.forEach(feature => {
+      const props = feature.properties;
       const geomType = feature.geometry?.type;
       const coords = feature.geometry?.coordinates;
 
@@ -228,54 +185,24 @@ function processCouncilData(data) {
         `);
       }
 
-      // === Point: single marker
-      else if (geomType === "Point") {
-  const [lng, lat] = coords;
-  const marker = L.marker([lat, lng], {
-    icon: L.icon({
-      iconUrl: "icons/ramm-closed.png", 
-      iconSize: [30, 40], 
-      iconAnchor: [15, 40]
-    })
-  }).addTo(councilLayer);
-
-  marker.bindPopup(`
-    <b>${props.Location} - ${props.Status}</b><br>
-    ${props.Type}: ${props.Description}<br>
-    <small>Date: ${props.Date}</small><br>
-    <em>${props.Notes || ''}</em>
-  `);
-}
-
-
       // === Unsupported geometries
       else {
         console.warn("Skipped non-Line/Polygon feature:", geomType, props.Location);
       }
-  });
-}
-
-// 6. Helper functions
-function formatDateTime(timestamp) {
-  return new Date(timestamp).toLocaleString("en-NZ", {
-    dateStyle: "medium",
-    timeStyle: "short",
-    hour12: false,
-    timeZone: "Pacific/Auckland"
-  });
-}
-
-function showDataError(source) {
-  const element = document.getElementById(`${source}-status`);
-  element.textContent = "⚠️ Data update failed - trying again soon";
-  element.style.color = "red";
+    });
+  })
   
-  // Revert to normal after 30 seconds
-  setTimeout(() => {
-    element.textContent = `Last update: ${formatDateTime(source === 'nzta' ? nztaDataTimestamp * 1000 : councilDataTimestamp)}`;
-    element.style.color = "";
-  }, 30000);
-}
+  .catch(error => {
+    console.error("Failed to load RAMM data:", error);
+  });
+// =========================================================
+// Layer Toggle UI
+// =========================================================
+const overlays = {
+  "NZTA Events": nztaLayer,
+  "Council Closures": councilLayer
+};
 
-// 7. Initialize the auto-refresh system
-document.addEventListener('DOMContentLoaded', initAutoRefresh);
+L.control.layers(null, overlays, { collapsed: false }).addTo(map);
+
+
