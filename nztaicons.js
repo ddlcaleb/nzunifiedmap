@@ -1,18 +1,18 @@
 const nztaIcons = {
   "Road Closure": L.icon({
-    iconUrl: 'https://ddlcaleb.github.io/nzunifiedmap/icons/road-closures.svg',
+    iconUrl: 'icons/road-closures.svg',
     iconSize: [30, 30]
   }),
   "Road Hazard": L.icon({
-    iconUrl: 'https://ddlcaleb.github.io/nzunifiedmap/icons/road-hazards.svg',
+    iconUrl: 'icons/road-hazards.svg',
     iconSize: [30, 30]
   }),
   "Area Warning": L.icon({
-    iconUrl: 'https://ddlcaleb.github.io/nzunifiedmap/icons/area-warnings.svg',
+    iconUrl: 'icons/area-warnings.svg',
     iconSize: [30, 30]
   }),
   "Road Work": L.icon({
-    iconUrl: 'https://ddlcaleb.github.io/nzunifiedmap/icons/road-works.svg',
+    iconUrl: 'icons/road-works.svg',
     iconSize: [30, 30]
   }),
   "Default": L.icon({
