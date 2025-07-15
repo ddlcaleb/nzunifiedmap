@@ -26,11 +26,27 @@ function initAutoRefresh() {
   }, REFRESH_INTERVAL);
   
   // Add manual refresh button
-  const refreshBtn = L.easyButton('fa-refresh', () => {
-    fetchNZTAData();
-    fetchCouncilData();
-  }).addTo(map);
-  refreshBtn.setPosition('topright');
+
+  // const refreshBtn = L.easyButton('fa-refresh', () => {
+  //   fetchNZTAData();
+  //   fetchCouncilData();
+  // }).addTo(map);
+  // refreshBtn.setPosition('topright');
+const refreshBtn = L.easyButton({
+  states: [{
+    stateName: 'refresh-data',
+    icon: '<span style="font-size: 18px; background: transparent; border: none;">&#x21bb;</span>', // 🔄 Unicode refresh symbol
+    title: 'Refresh Map Data',
+    onClick: function(btn, map) {
+      fetchNZTAData();
+      fetchCouncilData();
+    }
+  }]
+}).addTo(map);
+
+refreshBtn.setPosition('topright');
+
+
 }
 
 // 4. Data fetching functions
@@ -279,3 +295,13 @@ function showDataError(source) {
 
 // 7. Initialize the auto-refresh system
 document.addEventListener('DOMContentLoaded', initAutoRefresh);
+
+// =========================================================
+// Layer Toggle UI
+// =========================================================
+const overlays = {
+  "NZTA Events": nztaLayer,
+  "Council Closures": councilLayer
+};
+
+L.control.layers(null, overlays, { collapsed: false }).addTo(map);
