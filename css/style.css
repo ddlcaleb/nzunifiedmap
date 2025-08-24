@@ -1,0 +1,77 @@
+html, body, #map {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+#legend {
+  position: absolute;
+  bottom: 30px;
+  left: 10px;
+  background: white;
+  padding: 10px;
+  border-radius: 8px;
+  font-family: sans-serif;
+  font-size: 14px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.3);
+  z-index: 1000;
+}
+#legend h4 {
+  margin: 0 0 5px;
+}
+#legend div {
+  margin: 3px 0;
+}
+#legend span {
+  display: inline-block;
+  width: 20px;
+  height: 10px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+#updates {
+  position: absolute;
+  top: 10px;
+  left: 45px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 10px 15px;
+  font-size: 14px;
+  border-radius: 8px;
+  z-index: 1000;
+  font-family: sans-serif;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+
+
+/* when nav is closed move it fully off-screen to the left */
+.side-closed #sideNav { transform: translateX(-100%); opacity: 0.98; }
+.side-closed #menuToggle { transform: rotate(180deg); }
+.side-open #menuToggle { transform: rotate(0deg); }
+
+.field { margin-bottom: 10px; }
+.field label { display:block; font-weight:600; margin-bottom:6px; }
+.field input { width:100%; padding:18px 10px; border-radius:6px; border:1px solid #cfcfcf; font-size:14px; }
+
+.suggestions { list-style:none; margin:6px 0 0; padding:0; max-height:160px; overflow:auto; border:1px solid #eee; border-radius:6px; display:none; background:#fff; }
+.suggestions li { padding:8px 10px; cursor:pointer; }
+.suggestions li:hover, .suggestions li:focus { background:#f0f8ff; }
+.actions { display:flex; gap:8px; margin-top:6px; }
+.actions button { flex:1; padding:8px 10px; border-radius:6px; border:none; cursor:pointer; font-weight:700; }
+#goBtn { background:#0072b5; color:#fff; }
+#swapBtn { background:#f1f1f1; }
+
+.routes-list { list-style:none; padding:0; margin:8px 0 0; display:flex; flex-direction:column; gap:8px; }
+.routes-list li { padding:8px 10px; border-radius:8px; background:#f6fbff; border:1px solid #dfeffb; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
+.routes-list li.selected { border-color:#0072b5; background:#e6f2ff; box-shadow:0 4px 12px rgba(0,0,0,0.06); }
+.routes-list .duration { font-size:13px; color:#333; }
+.muted { color:#666; font-size:13px; margin-top:8px; }
+
+@media (max-width:600px) {
+  #sideNav { width: calc(100% - 20px); left:10px; right:10px; top:70px; }
+  #menuToggle { left: calc(100% - 54px); top: 76px; }
+}
+
+/* spacing fix: ensure inputs don't touch edge */
+.field input { padding-left: 12px; padding-right: 12px; }
+
+
