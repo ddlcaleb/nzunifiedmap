@@ -4,16 +4,16 @@
   <title>NZ Road Closures Map</title>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<link rel="icon" type="image/png" href="favicon-2.png">
+  <link rel="stylesheet" href="./css/style.css" />
   <!-- Leaflet CSS -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 
-  <!-- Your custom CSS -->
-  <link rel="stylesheet" href="style.css" />
+  
+  
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.css">
+
+  <link rel="stylesheet" href="./css/navigationmenu.css">
 </head>
 <div id="legend">
   <h4>RAMM Legend</h4>
@@ -27,27 +27,69 @@
   <div><strong>RAMM Last Updated:</strong> <span id="ramm-updated">Loading...</span></div>
 </div>
 
-<!-- <div id="data-status">
-  <span id="nzta-status">NZTA: Loading...</span> | 
-  <span id="council-status">Council: Loading...</span>
-</div> -->
-<!-- <div id="council-updated">Council data not loaded yet</div> -->
+
 
 
 <body>
   <div id="map"></div>
 
+<!-- <button id="menuToggle">☰</button> -->
+ <button id="menuToggle">></button>
+
+<div id="sideNav">
+  <button class="close-btn" aria-label="Close route planner">×</button>
+  <h3 id="plannerTitle">Route Planner</h3>
+
+  <form id="routeForm" onsubmit="return false;" aria-label="Route planner form">
+    <div class="field">
+      <label for="start">Start</label>
+      <input type="text" id="start" placeholder="Enter start location" aria-autocomplete="list" aria-controls="start-suggestions" autocomplete="off">
+      <ul id="start-suggestions" class="suggestions" role="listbox" aria-label="Start suggestions"></ul>
+    </div>
+
+    <div class="field">
+      <label for="end">Destination</label>
+      <input type="text" id="end" placeholder="Enter destination" aria-autocomplete="list" aria-controls="end-suggestions" autocomplete="off">
+      <ul id="end-suggestions" class="suggestions" role="listbox" aria-label="Destination suggestions"></ul>
+    </div>
+
+    <div class="actions">
+      <button id="goBtn" type="button" aria-label="Calculate routes">Go</button>
+      <button id="swapBtn" type="button" aria-label="Swap start and destination">Swap</button>
+    </div>
+  </form>
+
+  <div id="routeOptions" aria-live="polite">
+    <h4>Suggested Routes</h4>
+    <ul id="routesList" class="routes-list" role="list" aria-label="Suggested routes">
+      <!-- routes populated here -->
+    </ul>
+    <div id="routesMessage" class="muted">Enter start and destination and click Go</div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
 <!-- Leaflet JS -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
 <!-- Custom Icons -->
-<script src="nztaicons.js"></script>
+<script src="./js/nztaicons.js"></script>
 
 <!-- Map Logic -->
-<script src="script.js"></script>
+<script src="./js/script.js"></script>
+<!-- Route planner (autocomplete + routing) -->
+<script src="./js/directions.js"></script>
 <!-- Add these to your HTML <head> or before </body> -->
 
+
 <script src="https://cdn.jsdelivr.net/npm/leaflet-easybutton@2/src/easy-button.js"></script>
+<script src="https://unpkg.com/esri-leaflet@3.0.11/dist/esri-leaflet.js"></script>
+<script src="./js/ui-toggle.js"></script>
 
 
 </body>
